@@ -1,0 +1,8 @@
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions.Enrich.get -> System.Action<System.Diagnostics.Activity, string, object>
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions.Enrich.set -> void
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions.RecordException.get -> bool
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions.RecordException.set -> void
+OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions.ActiveMQInstrumentationOptions() -> void
+OpenTelemetry.Trace.TracerProviderBuilderExtensions
+static OpenTelemetry.Trace.TracerProviderBuilderExtensions.AddActiveMQInstrumentation(this OpenTelemetry.Trace.TracerProviderBuilder builder, System.Action<OpenTelemetry.Instrumentation.ActiveMQ.ActiveMQInstrumentationOptions> configureActiveMQInstrumentationOptions = null) -> OpenTelemetry.Trace.TracerProviderBuilder
