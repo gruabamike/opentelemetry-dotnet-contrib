@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Apache.NMS;
 using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Trace;
@@ -33,10 +34,10 @@ internal sealed class ActiveMQDiagnosticListener : ListenerHandler
     public const string ErrorMessageSend = ActiveMQEventNamePrefix + "MessageSendError";
     public const string ErrorMessageReceive = ActiveMQEventNamePrefix + "MessageReceiveError";
 
-    private readonly PropertyFetcher<object> connectionFactoryFetcher = new("ConnectionFactory");
-    private readonly PropertyFetcher<object> connectionFetcher = new("Connection");
-    private readonly PropertyFetcher<IMessage> messageFetcher = new("Message");
-    private readonly PropertyFetcher<Exception> exceptionFetcher = new("Exception");
+    private readonly PropertyFetcher<IConnectionFactory?> connectionFactoryFetcher = new("ConnectionFactory");
+    private readonly PropertyFetcher<IConnection?> connectionFetcher = new("Connection");
+    private readonly PropertyFetcher<IMessage?> messageFetcher = new("Message");
+    private readonly PropertyFetcher<Exception?> exceptionFetcher = new("Exception");
 
     private readonly ActiveMQInstrumentationOptions options;
 
@@ -96,9 +97,8 @@ internal sealed class ActiveMQDiagnosticListener : ListenerHandler
                 // Enrich activity from payload only if sampling decision is favourable
                 if (activity.IsAllDataRequested)
                 {
-                    // activity.DisplayName = "hi";
-
-                    // TODO: add attributes to activity using SemanticConventions and maybe controlled by options
+                    _ = this.connectionFactoryFetcher.TryFetch(payload, out var connectionFactory);
+                    this.SetMessagingActivityDetails(activity, connectionFactory, message);
 
                     try
                     {
@@ -145,9 +145,12 @@ internal sealed class ActiveMQDiagnosticListener : ListenerHandler
                 // Enrich activity from payload only if sampling decision is favourable
                 if (activity.IsAllDataRequested)
                 {
-                    activity.DisplayName = "hi";
+                    _ = this.connectionFactoryFetcher.TryFetch(payload, out var connectionFactory);
+                    this.SetMessagingActivityDetails(activity, connectionFactory, message);
 
-                    // TODO: add attributes to activity using SemanticConventions and maybe controlled by options
+                    _ = this.connectionFetcher.TryFetch(payload, out var connection);
+                    activity.SetTag(TraceSemanticConventions.AttributeMessagingOperation, TraceSemanticConventions.MessagingOperationValues.Receive);
+                    activity.SetTag(TraceSemanticConventions.AttributeMessagingConsumerId, connection?.ClientId ?? "unknown");
 
                     try
                     {
@@ -233,6 +236,38 @@ internal sealed class ActiveMQDiagnosticListener : ListenerHandler
 
                 break;
             }
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void SetMessagingActivityDetails(
+        Activity activity,
+        IConnectionFactory? connectionFactory,
+        IMessage message)
+    {
+        var (destinationName, destinationKind) = this.GetMessageDestinationValues(message.NMSDestination);
+        activity.DisplayName = destinationName;
+
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingDestination, destinationName);
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingDestinationKind, destinationKind);
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingTempDestination, message.NMSDestination.IsTemporary);
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingUrl, connectionFactory?.BrokerUri?.ToString() ?? "unkown");
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingMessageId, message.NMSMessageId);
+        activity.SetTag(TraceSemanticConventions.AttributeMessagingConversationId, message.NMSCorrelationID);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private (string DestinationName, string DestinationKindValue) GetMessageDestinationValues(IDestination destination)
+    {
+        switch (destination.DestinationType)
+        {
+            case DestinationType.Topic:
+            case DestinationType.TemporaryTopic:
+                return (((ITopic)destination).TopicName, TraceSemanticConventions.MessagingDestinationKindValues.Topic);
+            case DestinationType.Queue:
+            case DestinationType.TemporaryQueue:
+            default:
+                return (((IQueue)destination).QueueName, TraceSemanticConventions.MessagingDestinationKindValues.Queue);
         }
     }
 }

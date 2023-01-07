@@ -37,6 +37,6 @@ internal sealed class ActiveMQSourceInfoProvider
 
     public static readonly IEnumerable<KeyValuePair<string, object>> CreationTags = new[]
     {
-        new KeyValuePair<string, object>(SemanticConventions.AttributeMessagingSystem, ApacheActiveMQSystemName),
+        new KeyValuePair<string, object>(TraceSemanticConventions.AttributeMessagingSystem, ApacheActiveMQSystemName),
     };
 }
