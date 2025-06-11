@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetMinimumSupportedVersion)</TargetFramework>
+    <Description>MQTTnet client instrumentation for OpenTelemetry .NET.</Description>
+    <PackageTags>$(PackageTags);distributed-tracing;MQTT;MQTTnet</PackageTags>
+    <MinVerTagPrefix>Instrumentation.MqttNetClient-</MinVerTagPrefix>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--Do not run Package Baseline Validation as this package has never released a stable version.
+  Remove this property once we have released a stable version and add PackageValidationBaselineVersion property.-->
+  <PropertyGroup>
+    <DisablePackageBaselineValidation>true</DisablePackageBaselineValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MQTTnet" Version="$(MqttNetPkgVer)" />
+    <PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryCoreLatestVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(RepoRoot)\src\Shared\Guard.cs" Link="Includes\Guard.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,9 @@
+OpenTelemetry.Instrumentation.MqttNetClient.MqttClientInstrumentationOptions
+OpenTelemetry.Instrumentation.MqttNetClient.MqttClientInstrumentationOptions.Enrich.get -> System.Action<System.Diagnostics.Activity!, MQTTnet.MqttApplicationMessage!>?
+OpenTelemetry.Instrumentation.MqttNetClient.MqttClientInstrumentationOptions.Enrich.set -> void
+OpenTelemetry.Instrumentation.MqttNetClient.MqttClientInstrumentationOptions.MqttClientInstrumentationOptions() -> void
+OpenTelemetry.Instrumentation.MqttNetClient.ServiceCollectionExtensions
+OpenTelemetry.Trace.TracerProviderBuilderExtensions
+static OpenTelemetry.Instrumentation.MqttNetClient.ServiceCollectionExtensions.AddMqttNetClientDecoratorTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static OpenTelemetry.Instrumentation.MqttNetClient.ServiceCollectionExtensions.AddMqttNetClientDecoratorTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Func<MQTTnet.IMqttClient!>! mqttClientProvider) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static OpenTelemetry.Trace.TracerProviderBuilderExtensions.AddMqttNetClientInstrumentation(this OpenTelemetry.Trace.TracerProviderBuilder! builder, MQTTnet.IMqttClient? mqttClient = null) -> OpenTelemetry.Trace.TracerProviderBuilder!
